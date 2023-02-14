@@ -1,0 +1,58 @@
+plugins {
+
+
+    id 'org.springframework.boot' version '3.0.2'
+    id 'io.spring.dependency-management' version '1.1.0'
+
+    id "systems.manifold.manifold-gradle-plugin" version "0.0.2-alpha"
+}
+
+manifold {
+    manifoldVersion = '2022.1.38'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '17'
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    def manifoldVersion = manifold.manifoldVersion.get()
+
+    implementation "systems.manifold:manifold-tuple-rt:${manifoldVersion}"
+    implementation "systems.manifold:manifold-json-rt:${manifoldVersion}"
+    implementation "systems.manifold:manifold-science:${manifoldVersion}"
+    implementation "systems.manifold:manifold-collections:${manifoldVersion}"
+    implementation "systems.manifold:manifold-text:${manifoldVersion}"
+
+    annotationProcessor "systems.manifold:manifold-props:${manifoldVersion}"
+    annotationProcessor "systems.manifold:manifold-tuple:${manifoldVersion}"
+    //
+    implementation 'org.springframework.boot:spring-boot-starter'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+tasks.named('jar') {
+    manifest {
+        attributes('Contains-Sources': 'java,class')
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += ['-Xplugin:Manifold']
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
